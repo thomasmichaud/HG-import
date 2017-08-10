@@ -32,6 +32,10 @@ foreach($loadSheets as $sheet){
 	$objWriter = new PHPExcel_Writer_Excel2007($objPHPExcel);
 	$objWriter->save($outputfile);
 
+	//Traitement du fichier généré
+
+	//SUppression du fichier généré
+
 }
 
 
