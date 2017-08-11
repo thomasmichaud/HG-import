@@ -33,7 +33,7 @@ foreach($loadSheets as $sheet){
 	$objWriter = new PHPExcel_Writer_Excel2007($objPHPExcel);
 	$objWriter->save($outputfile);
 
-	traitement($outputfile, $sheet);
+	traitement($outputfile, str_replace(" ","",$sheet));
 
 
 	//SUppression du fichier généré
