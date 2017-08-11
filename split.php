@@ -10,6 +10,7 @@ define('EOL',(PHP_SAPI == 'cli') ? PHP_EOL : '<br />');
 
 /** Include PHPExcel */
 require_once dirname(__FILE__) . '/Classes/PHPExcel.php';
+require_once dirname(__FILE__) . '/traitement.php';
 
 $file = "import.xlsx";
 $loadSheets = array('MAREE - Tableau 1', 'MAREE - Tableau 1-2', 'Viande - Tableau 1', 'Volaille - Tableau 1', 'F&L - Tableau 1', 'Epicerie Cremerie - Tableau 1');
@@ -32,9 +33,12 @@ foreach($loadSheets as $sheet){
 	$objWriter = new PHPExcel_Writer_Excel2007($objPHPExcel);
 	$objWriter->save($outputfile);
 
-	//Traitement du fichier généré
+	traitement($outputfile, $sheet);
+
 
 	//SUppression du fichier généré
+
+	unlink($outputfile);
 
 }
 

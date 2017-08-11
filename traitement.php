@@ -1,28 +1,8 @@
 <?php
 
-/** Error reporting */
-error_reporting(E_ALL);
-ini_set('display_errors', TRUE);
-ini_set('display_startup_errors', TRUE);
-date_default_timezone_set('Europe/Paris');
-
-define('EOL',(PHP_SAPI == 'cli') ? PHP_EOL : '<br />');
-
 /** Include PHPExcel */
 require_once dirname(__FILE__) . '/Classes/PHPExcel.php';
 require_once dirname(__FILE__) . '/merge.php';
-
-//Données de traitement
-//$file = "test.xlsx";
-$file = $_GET["source"].".xlsx";
-$objReader = new PHPExcel_Reader_Excel2007();
-$worksheetData = $objReader->listWorksheetInfo($file);
-$totalRows     = $worksheetData[0]['totalRows'];
-$totalColumns  = $worksheetData[0]['totalColumns'];
-$coloneSplit = $totalColumns / 2;
-
-//Données
-$alphabet = range('A', 'Z');
 
 //On créé le constructeur du filtre
 class MyReadFilter implements PHPExcel_Reader_IReadFilter
@@ -49,6 +29,21 @@ class MyReadFilter implements PHPExcel_Reader_IReadFilter
 	}
 }
 
+function traitement( $inputFile , $outputName) {
+
+//Données de traitement
+//$file = "test.xlsx";
+$file = $inputFile;
+$objReader = new PHPExcel_Reader_Excel2007();
+$worksheetData = $objReader->listWorksheetInfo($file);
+$totalRows     = $worksheetData[0]['totalRows'];
+$totalColumns  = $worksheetData[0]['totalColumns'];
+$coloneSplit = $totalColumns / 2;
+
+//Données
+$alphabet = range('A', 'Z');
+
+
 
 //On récupère la première colonne
 $objReader->setReadFilter( new MyReadFilter(1,$totalRows ,range('A',$alphabet[$coloneSplit-1])) );
@@ -72,7 +67,7 @@ $objWriter2 = new PHPExcel_Writer_Excel2007($objPHPExcel2);
 $objWriter2->save("export-c2.xlsx");
 
 //On merge les fichiers temporaires créés
-$outputFile = mergeSheet('export-c1.xlsx', 'export-c2.xlsx', $coloneSplit, $alphabet, $totalRows, $_GET["source"]);
+$outputFile = mergeSheet('export-c1.xlsx', 'export-c2.xlsx', $coloneSplit, $alphabet, $totalRows, $outputName);
 
 //Suppression des fichiers temporaires
 unlink('export-c1.xlsx');
@@ -82,11 +77,13 @@ unlink('export-c2.xlsx');
 $objReaderExport = new PHPExcel_Reader_Excel2007();
 $objPHPExcelExport = $objReaderExport->load($outputFile);
 $objWriterExport = new PHPExcel_Writer_CSV($objPHPExcelExport);
-$objWriterExport->setUseBOM(true);
+//$objWriterExport->setUseBOM(true);
 $objWriterExport->setDelimiter(';');
 $objWriterExport->setEnclosure('');
-//$objWriter->setLineEnding("\r\n"); 
-$objWriter->save("export.csv");
+//$objWriterExport->setLineEnding("\r\n"); 
+$objWriterExport->save($outputName."-export.csv");
+
+}
 
 //On supprime le fichier d'export xlsx
 //unlink($outputFile);
